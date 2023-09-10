@@ -1,0 +1,9 @@
+---
+import SearchPokemon from "../components/SearchPokemon";
+import Layout from "../layouts/Layout.astro";
+---
+<Layout  title="Pokedex">
+  <h1 class="text-center text-2xl">Buscar pokemon por nombre o id</h1>
+  <SearchPokemon client:load />
+
+</Layout>

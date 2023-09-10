@@ -1,0 +1,72 @@
+---
+import PokemonCard from '../../components/PokemonCard.astro';
+import Layout from '../../layouts/Layout.astro';
+import { type Generation, type MainRegion } from '../../types.d/generation';
+import { type Pokemon } from '../../types.d/pokemon';
+interface fetchData {
+  mainRegion: MainRegion
+  pokemons: Pokemon []
+}
+export async function getStaticPaths() {
+  return [
+    { params: { id: '1' } },
+    { params: { id: '2' } },
+    { params: { id: '3' } },
+    { params: { id: '4' } },
+    { params: { id: '5' } },
+    { params: { id: '6' } },
+    { params: { id: '7' } },
+    { params: { id: '8' } },
+    { params: { id: '9' } },
+  ];
+}
+const { id = '' }: { id?: string } = Astro.params;
+
+const fetchData = async (): Promise<fetchData> => {
+  const query = await fetch(`https://www.pokeapi.co/api/v2/generation/${id}`);
+
+  if (query.status === 404) {
+    Astro.redirect('/404', 302);
+  }
+
+  const generacion: Generation = await query.json();
+  const { main_region: mainRegion, pokemon_species } = generacion;
+  let pokemons: Pokemon[] = [];
+  const urls = pokemon_species.map(specie => specie.url.replace('pokemon-species', 'pokemon'));
+  const responses = await Promise.all(urls.map(url => fetch(url)));
+
+  const pokemonsData = await Promise.all(responses.map(response => response.json()));
+
+  pokemonsData.forEach(pokemon => pokemons.push(pokemon));
+  const pokemonSorts: Pokemon[] = pokemons.sort((a, b) => {
+  const idA = parseInt(a.id);
+  const idB = parseInt(b.id);
+  
+  if (idA < idB) {
+    return -1;
+  }
+  if (idA > idB) {
+    return 1;
+  }
+  
+  return 0;
+});
+  return { mainRegion, pokemons: pokemonSorts }
+};
+
+const {mainRegion , pokemons } = await fetchData();
+---
+<Layout title={`Generacion ${id}`}>
+  <section>
+    <h1 class="text-center text-4xl font-bold text-red-800">Generacion {id}</h1>
+    <h2 class="text-center text-2xl font-bold text-red-800">Region Principal:   Region Principal: {mainRegion.name.charAt(0).toUpperCase() + mainRegion.name.slice(1).toLowerCase()} </h2>
+    <div class="flex flex-wrap justify-center gap-3">
+      {
+        pokemons.map((pokemon: Pokemon) => (
+          <PokemonCard pokemon={pokemon} />
+        ))
+      }
+      
+    </div>
+  </section>
+</Layout>

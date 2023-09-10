@@ -1,0 +1,71 @@
+---
+import Pokeball from './Pokeball.astro'
+const fetchGenerations = async () => {
+  const query = await fetch('https://www.pokeapi.co/api/v2/generation');
+  const { results } = await query.json();
+  return results;
+};
+
+const generations = await fetchGenerations()
+
+---
+<script>
+  let showGenerations = false
+
+// UL con el menú desplegable
+const dropdown = document.querySelector('#generations-dropdown')
+
+// Elemento LI con clickeable
+const dropdownMenu = document.querySelector('#generations')
+  dropdownMenu?.addEventListener('click', () => {
+    showGenerations = !showGenerations
+    if (showGenerations) {
+      dropdown?.classList.remove('hidden');
+    } else {
+      dropdown?.classList.add('hidden');
+    }
+  })
+
+</script>
+
+<header class="bg-red-900 w-full px-4 py-2">
+  <nav class="w-full flex justify-between">
+    <div class="flex items-center">
+      <Pokeball w="36" h="36" />
+      <a class="text-2xl text-white font-bold" href="/">Poke AI</a>
+    </div>
+    <div class="relative">
+      <ul class="flex gap-3 items-center">
+        <!-- {
+          generations.map((_:any, indice: number) => (
+            <li class="text-white font-bold hover:underline">
+              <a href={`/generation/${indice + 1}`}>Gen-{indice + 1}</a>
+            </li>
+          ))
+        } -->
+        <li class="text-white font-bold hover:cursor-pointer hover:underline">
+          <a href="/pokedex">Pokedex</a>
+        </li>
+
+        <li class="text-white font-bold hover:cursor-pointer hover:underline" id="generations">
+          Generaciones
+          <ul id="generations-dropdown" class={`generations-dropdown absolute left-0 hidden bg-white text-gray-800 shadow-lg`}>
+            {
+              generations.map((_:any, indice: number) => (
+                <li>
+                  <a href={`/generation/${indice + 1}`} class="block px-4 py-2 hover:bg-gray-200">Gen-{indice + 1}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .generations-dropdown {
+    min-width: 120px;
+  }
+</style>

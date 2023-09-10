@@ -1,0 +1,32 @@
+---
+import type { Pokemon, Type } from "../types.d/pokemon";
+export interface PokemonCardProps {
+  pokemon: Pokemon | null;
+}
+const pokemon = Astro.props.pokemon
+console.log(pokemon)
+---
+
+<article class="w-80 bg-white relative shadow-lg rounded-lg overflow-hidden m-4">
+  <div class="px-4 py-2 bg-blue-500 text-white text-sm font-semibold absolute top-0 left-0 rounded-t-lg">
+    ID: {pokemon?.id}
+  </div>
+  <div class="flex items-center justify-center p-4">
+    <img
+      class="w-40 h-40"
+      src={pokemon?.sprites.other?.dream_world.front_default ?? pokemon?.sprites.front_default}
+      alt=""
+    />
+  </div>
+  <div class="text-center p-4">
+    <h1 class="text-xl font-semibold">{pokemon?.name}</h1>
+  </div>
+  <hr class="border-t border-gray-300" />
+  <div class="flex justify-center p-4">
+    {pokemon?.types.map(({ type}:{type:Type['type']}) => (
+      <span class="px-2 py-1 bg-gray-200 text-gray-800 rounded-full text-sm mx-1">
+        {type.name}
+      </span>
+    ))}
+  </div>
+</article>
